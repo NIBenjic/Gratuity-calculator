@@ -50,9 +50,13 @@
 		$(document).on("touchmove mousemove", "#page3", function(e) { e.preventDefault(); cal(); });
 		
 		if(isTouchSupported)
+		{
 			$("div.key").on({"touchstart":function(e){ e.preventDefault(); ent($(this).text()); } });
+		}
 		else
+		{
 			$("div.key").on({"mousedown":function(e){ e.preventDefault(); ent($(this).text()); } });			
+		}
 		
 		$("input:radio").on("change", function() {
 			localStorage.setItem("round", $("input:radio[name=round]:checked").val());
@@ -311,6 +315,7 @@
 					$('#landscape').css({"display":"", "visibility":""});
 				}
 			}
+
 		});
 	});
 	
