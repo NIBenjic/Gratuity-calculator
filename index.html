@@ -296,10 +296,13 @@
 		{
 			$("#restart").css("display", "none");
 		}
+		
+		/*
 		if(window.navigator.standalone != true) {
 			$("#restart").css({"display":"none", "visibility":"hidden"});
 			$("#install").css({"display":"inline", "visibility":"visible"});
 		}
+		*/
 		
 		$("#loading").delay(100).fadeOut(400, function() {
 			/* For iOS
@@ -350,6 +353,8 @@
 		height: 100%;
 	}
 	#install {
+		display: none;
+		visibility: hidden;
 		z-index: 998;
 	}
 
