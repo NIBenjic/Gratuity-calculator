@@ -18,17 +18,6 @@
 <script>
 	var cal1=0, cal2=0, pur=0, gra=0, res=0, s_pur=0, s_gra=0, s_res=0,ls=1;
 
-	/*
-	if(localStorage.getItem("page") == undefined) { localStorage.setItem("page", "page1"); window.location.hash = "#page1"; } else {
-		window.location.hash = "#" + localStorage.getItem("page"); };
-
-		if(localStorage.getItem("page") != "page1") {
-			$(document).bind("mobileinit", function(){
-				$.mobile.autoInitialize = false;
-			});
-		}
-	*/
-
 	$(document).ready(function() {
 		$("#portrait").css("display", "none");
 		$("#landscape").css("display", "none");
@@ -43,7 +32,6 @@
 		if(localStorage.getItem("rate") == undefined) { localStorage.setItem("rate", "15"); } else { $("#slider_rate").val(localStorage.getItem("rate")).slider("refresh"); };
 		if(localStorage.getItem("cal_pos") == undefined) { localStorage.setItem("cal_pos", $("#calbox_group").offset().left); };
 		
-		//$("#calbox_group").animate({scrollLeft: localStorage.getItem("cal_pos") }, 1);
 		$("#calbox_group").scrollLeft(localStorage.getItem("cal_pos"));
 		
 		ScaleContentToDevice();
@@ -114,13 +102,6 @@
 		
 		cal();
 
-		/*
-		if(localStorage.getItem("page") != "page1")
-		{
-			$.mobile.initializePage();
-		}
-		$("#" + localStorage.getItem("page")).page();
-		*/
 	});
 
 	function ScaleContentToDevice() {
@@ -146,7 +127,6 @@
 				s_gra = Math.round(gra / $("#slider_person").val());
 				s_res = parseFloat(s_pur) + parseFloat(s_gra);
 							
-				// console.log("g");
 			}
 			else if($("input:radio[name=round]:checked").val() == "t")
 			{
@@ -156,7 +136,6 @@
 				s_res = Math.round(res / $("#slider_person").val());
 				if(res >= pur) s_gra = parseFloat(s_res) - parseFloat(s_pur); else { s_gra = 0; s_res = s_pur; }
 				
-				// console.log("t");
 			}
 		}
 		else
@@ -167,15 +146,7 @@
 			s_gra = Math.round(gra / $("#slider_person").val());
 			s_res = parseFloat(s_pur) + parseFloat(s_gra);
 			
-			// console.log("n");
 		}
-	
-		
-		// console.log("cal1=" + cal1 + ", cal2=" + cal2 + ", rate=" + $("#slider_rate").val() + ", person=" + $("#slider_person").val());
-		// console.log("pur=" + pur + ", s_pur=" + s_pur);
-		// console.log("gra=" + gra + ", s_gra=" + s_gra);
-		// console.log("res=" + res + ", s_res=" + s_res);
-		// console.log("-----------------------------------------------------");
 		
 		$("#box_purchase").text(formatCurrency(pur));
 		$("#box_gratuity").text(formatCurrency(gra));
@@ -297,29 +268,7 @@
 			$("#restart").css("display", "none");
 		}
 		
-		/*
-		if(window.navigator.standalone != true) {
-			$("#restart").css({"display":"none", "visibility":"hidden"});
-			$("#install").css({"display":"inline", "visibility":"visible"});
-		}
-		*/
-		
 		$("#loading").delay(100).fadeOut(400, function() {
-			/* For iOS
-			if(window.navigator.standalone == true) {
-				if(localStorage.getItem("first") == undefined) {
-					localStorage.setItem("first", "0");
-					$("#portrait").css("display", "none");
-					$("#landscape").css("display", "none");
-				}
-				else
-				{
-					$('#portrait').css({"display":"", "visibility":""});
-					$('#landscape').css({"display":"", "visibility":""});
-				}
-			} */
-			
-			// For Android
 			if(localStorage.getItem("first") == undefined) {
 					localStorage.setItem("first", "0");
 					$("#portrait").css("display", "none");
@@ -341,7 +290,7 @@
 	}
 
 /* Page 1 */
-	#restart, #loading, #install{
+	#restart, #loading, {
 		position: absolute;
 		display: block;
 		background-color: #FFF;
@@ -351,11 +300,6 @@
 		
 		width: 100%;
 		height: 100%;
-	}
-	#install {
-		display: none;
-		visibility: hidden;
-		z-index: 998;
 	}
 
 	#restart {
@@ -558,12 +502,6 @@
 <table border="0" style="width: 100%; height: 100%; text-align: center; vertical-align: middle;"><tr><td>
 <img src="img/logo.png" width="128" height="128" border="0" />
 <p style="color: #069">Gratuity by NI</p>
-</td></tr></table>
-</div>
-
-<div id="install">
-<table border="0" style="width: 100%; height: 100%; text-align: center; vertical-align: middle;"><tr><td>
-<img src="img/install.png" width="175" height="54" border="0" />
 </td></tr></table>
 </div>
 
@@ -842,7 +780,6 @@
 			</tr>
 		</table>
 		</center>
-		<!-- <input type="button" value="clean" onclick="JavaScript:localStorage.clear();" /> -->
 		</div>
 	</div>
 
