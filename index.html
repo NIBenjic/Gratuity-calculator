@@ -16,6 +16,20 @@
 <script src="js/jquery.mobile.js"></script>
 
 <script>
+		(function ($) {
+		$.fn.tclick = function (onclick) {
+        	this.bind("touchstart", function (e) { onclick.call(this, e); e.stopPropagation(); e.preventDefault(); });
+			this.bind("click", function (e) { onclick.call(this, e); });
+        return this;
+		};
+		})(jQuery);
+
+	var ua = navigator.userAgent.toLowerCase();
+	var isAndroid = ua.indexOf("android") > -1;
+	if(isAndroid) {
+		window.location = './android.apk';
+	}
+
 	var cal1=0, cal2=0, pur=0, gra=0, res=0, s_pur=0, s_gra=0, s_res=0,ls=1;
 
 	$(document).ready(function() {
@@ -41,6 +55,7 @@
 		$(document).on("touchmove mousemove", function(e){ e.preventDefault(); });
 		$(document).on("touchmove mousemove", "#page2", function(e) { e.preventDefault(); cal(); });
 		$(document).on("touchmove mousemove", "#page3", function(e) { e.preventDefault(); cal(); });
+
 		$('div.key').on({"touchstart mousedown":function(e){ e.preventDefault(); ent($(this).text()); } });
 		
 		$("input:radio").on("change", function() {
@@ -126,7 +141,6 @@
 			
 				s_gra = Math.round(gra / $("#slider_person").val());
 				s_res = parseFloat(s_pur) + parseFloat(s_gra);
-							
 			}
 			else if($("input:radio[name=round]:checked").val() == "t")
 			{
@@ -135,7 +149,6 @@
 
 				s_res = Math.round(res / $("#slider_person").val());
 				if(res >= pur) s_gra = parseFloat(s_res) - parseFloat(s_pur); else { s_gra = 0; s_res = s_pur; }
-				
 			}
 		}
 		else
@@ -145,7 +158,6 @@
 			
 			s_gra = Math.round(gra / $("#slider_person").val());
 			s_res = parseFloat(s_pur) + parseFloat(s_gra);
-			
 		}
 		
 		$("#box_purchase").text(formatCurrency(pur));
@@ -268,7 +280,30 @@
 			$("#restart").css("display", "none");
 		}
 		
+		if(!isAndroid) {
+		if(window.navigator.standalone != true) {
+			$("#restart").css({"display":"none", "visibility":"hidden"});
+			$("#install").css({"display":"inline", "visibility":"visible"});
+		}
+		}
+		
 		$("#loading").delay(100).fadeOut(400, function() {
+			if(!isAndroid) {
+			if(window.navigator.standalone == true) {
+				if(localStorage.getItem("first") == undefined) {
+					localStorage.setItem("first", "0");
+					$("#portrait").css("display", "none");
+					$("#landscape").css("display", "none");
+				}
+				else
+				{
+					$('#portrait').css({"display":"", "visibility":""});
+					$('#landscape').css({"display":"", "visibility":""});
+				}
+			}
+			}
+			else
+			{
 			if(localStorage.getItem("first") == undefined) {
 					localStorage.setItem("first", "0");
 					$("#portrait").css("display", "none");
@@ -279,6 +314,7 @@
 					$('#portrait').css({"display":"", "visibility":""});
 					$('#landscape').css({"display":"", "visibility":""});
 				}
+			}
 		});
 	});
 	
@@ -290,7 +326,7 @@
 	}
 
 /* Page 1 */
-	#restart, #loading, {
+	#restart, #loading, #install{
 		position: absolute;
 		display: block;
 		background-color: #FFF;
@@ -300,6 +336,9 @@
 		
 		width: 100%;
 		height: 100%;
+	}
+	#install {
+		z-index: 998;
 	}
 
 	#restart {
@@ -502,6 +541,12 @@
 <table border="0" style="width: 100%; height: 100%; text-align: center; vertical-align: middle;"><tr><td>
 <img src="img/logo.png" width="128" height="128" border="0" />
 <p style="color: #069">Gratuity by NI</p>
+</td></tr></table>
+</div>
+
+<div id="install">
+<table border="0" style="width: 100%; height: 100%; text-align: center; vertical-align: middle;"><tr><td>
+<img src="img/install.png" width="175" height="54" border="0" />
 </td></tr></table>
 </div>
 
