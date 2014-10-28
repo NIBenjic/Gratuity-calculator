@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="en" manifest="cache.manifest">
+<!-- html lang="en" manifest="cache.manifest" -->
 <head>
 <meta charset="utf-8">
 <title>Gratuity</title>
@@ -30,6 +30,10 @@
 	*/
 
 	$(document).ready(function() {
+		$("#portrait").css("display", "none");
+		$("#landscape").css("display", "none");
+		$("#install").css("display", "none");
+		
 		if(localStorage.getItem("cal1") == undefined) { localStorage.setItem("cal1", "0"); } else { cal1 = localStorage.getItem("cal1"); };
 		if(localStorage.getItem("cal2") == undefined) { localStorage.setItem("cal2", "0"); } else { cal2 = localStorage.getItem("cal2"); };
 		if(localStorage.getItem("person") == undefined) { localStorage.setItem("person", "1"); } else { $("#page2").page(); $("#slider_person").val(localStorage.getItem("person")).slider("refresh"); };
@@ -286,13 +290,63 @@
 	function formatCurrency(n){
 		return "$" + ((n * 0.01).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
-	
-	//$(window).load(function(){ });
+			
+	$(window).load(function() {
+		if(localStorage.getItem("first") != undefined)
+		{
+			$("#restart").css("display", "none");
+		}
+		if(window.navigator.standalone != true) {
+			$("#restart").css({"display":"none", "visibility":"hidden"});
+			$("#install").css({"display":"inline", "visibility":"visible"});
+		}
+		
+		$("#loading").delay(100).fadeOut(400, function() {
+			if(window.navigator.standalone == true) {
+				if(localStorage.getItem("first") == undefined) {
+					localStorage.setItem("first", "0");
+					$("#portrait").css("display", "none");
+					$("#landscape").css("display", "none");
+				}
+				else
+				{
+					$('#portrait').css({"display":"", "visibility":""});
+					$('#landscape').css({"display":"", "visibility":""});
+				}
+			}
+		});
+	});
 	
 </script>
 
 <style>
+	body {
+    	overflow:hidden;
+	}
+
 /* Page 1 */
+	#restart, #loading, #install{
+		position: absolute;
+		display: block;
+		background-color: #FFF;
+		
+		top: 0px;
+		left: 0px;
+		
+		width: 100%;
+		height: 100%;
+	}
+	#install {
+		z-index: 998;
+	}
+
+	#restart {
+		z-index: 996;
+	}
+
+	#loading {
+		z-index: 999;
+	}
 
 	#landscape {
 		display: none;
@@ -482,6 +536,27 @@
 </head>
 
 <body>
+<div id="loading">
+<table border="0" style="width: 100%; height: 100%; text-align: center; vertical-align: middle;"><tr><td>
+<img src="img/logo.png" width="128" height="128" border="0" />
+<p style="color: #069">Gratuity by NI</p>
+</td></tr></table>
+</div>
+
+<div id="install">
+<table border="0" style="width: 100%; height: 100%; text-align: center; vertical-align: middle;"><tr><td>
+<img src="img/logo.png" width="128" height="128" border="0" />
+<p style="color: #069">Install Please!</p>
+</td></tr></table>
+</div>
+
+<div id="restart">
+<table border="0" style="width: 100%; height: 100%; text-align: center; vertical-align: middle;"><tr><td>
+<img src="img/logo.png" width="128" height="128" border="0" />
+<p style="color: #069">Please relaunch the App!</p>
+</td></tr></table>
+</div>
+
 <div id="landscape">
 	<table style="width: 100%; height: 100%; text-align: center; vertical-align: middle">
 		<tr><td>

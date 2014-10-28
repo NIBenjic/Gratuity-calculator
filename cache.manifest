@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# Version: 2.11
+# Version: 2.13
 
 NETWORK:
 *
@@ -11,3 +11,4 @@ js/jquery.mobile.js
 css/jquery.mobile.css
 img/ajax-loader.gif
 img/icon.png
+img/logo.png
