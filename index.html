@@ -1,0 +1,750 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" manifest="cache.manifest" -->
+<head>
+<meta charset="utf-8">
+<title>Gratuity</title>
+
+<meta name="viewport" content="width=320px, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="apple-touch-icon" href="img/icon.png" />
+
+<link rel="stylesheet" href="css/jquery.mobile.css" />
+
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile.js"></script>
+
+<script>
+	var cal1=0, cal2=0, pur=0, gra=0, res=0, s_pur=0, s_gra=0, s_res=0,ls=1;
+
+	/*
+	if(localStorage.getItem("page") == undefined) { localStorage.setItem("page", "page1"); window.location.hash = "#page1"; } else {
+		window.location.hash = "#" + localStorage.getItem("page"); };
+
+		if(localStorage.getItem("page") != "page1") {
+			$(document).bind("mobileinit", function(){
+				$.mobile.autoInitialize = false;
+			});
+		}
+	*/
+
+	$(document).ready(function() {
+		if(localStorage.getItem("cal1") == undefined) { localStorage.setItem("cal1", "0"); } else { cal1 = localStorage.getItem("cal1"); };
+		if(localStorage.getItem("cal2") == undefined) { localStorage.setItem("cal2", "0"); } else { cal2 = localStorage.getItem("cal2"); };
+		if(localStorage.getItem("person") == undefined) { localStorage.setItem("person", "1"); } else { $("#page2").page(); $("#slider_person").val(localStorage.getItem("person")).slider("refresh"); };
+		if(localStorage.getItem("round") == undefined) { localStorage.setItem("round", "n"); } else { $("#page3").page(); $("input:radio[name=round]").filter("[value=" + localStorage.getItem('round') + "]").attr("checked", "checked"); };
+		if(localStorage.getItem("method") == undefined) { localStorage.setItem("method", "o"); } else { $("input:radio[name=method]").filter("[value=" + localStorage.getItem('method') + "]").attr("checked", "checked"); };
+		$("input[type='radio']").checkboxradio("refresh");
+		if(localStorage.getItem("rate") == undefined) { localStorage.setItem("rate", "15"); } else { $("#slider_rate").val(localStorage.getItem("rate")).slider("refresh"); };
+		if(localStorage.getItem("cal_pos") == undefined) { localStorage.setItem("cal_pos", $("#calbox_group").offset().left); };
+		
+		//$("#calbox_group").animate({scrollLeft: localStorage.getItem("cal_pos") }, 1);
+		$("#calbox_group").scrollLeft(localStorage.getItem("cal_pos"));
+		
+		ScaleContentToDevice();
+		
+		$(document).on("pageshow", function(){ ScaleContentToDevice(); });
+		$(window).on('resize orientationchange', function(){ ScaleContentToDevice(); });			
+		$(document).on("touchmove mousemove", function(e){ e.preventDefault(); });
+		$(document).on("touchmove mousemove", "#page2", function(e) { e.preventDefault(); cal(); });
+		$(document).on("touchmove mousemove", "#page3", function(e) { e.preventDefault(); cal(); });
+		$('div.key').on({"touchstart mousedown":function(e){ e.preventDefault(); ent($(this).text()); } });
+		
+		$("input:radio").on("change", function() {
+			localStorage.setItem("round", $("input:radio[name=round]:checked").val());
+			localStorage.setItem("method", $("input:radio[name=method]:checked").val());
+
+			cal();
+		});
+				
+		$(".navbar a").on("touchstart touchend mousedown mouseup", function(e){
+				e.preventDefault();
+				$.mobile.changePage($(this).attr("href"), { transition: "none", changeHash: true });
+				localStorage.setItem("page", $.mobile.activePage.attr("id"));
+		});
+		
+		$("#calbox_group").on("swiperight", function(e){
+			e.preventDefault();
+			localStorage.setItem("cal_pos", $("#calbox_group").offset().left);
+			$("#calbox_group").animate({scrollLeft: $("#calbox_group").offset().left }, 200);
+		}); 
+
+		$("#calbox_group").on("swipeleft", function(e){
+			e.preventDefault();
+			localStorage.setItem("cal_pos", $("#calbox_group").offset().left + $("#calbox_1").width());
+			$("#calbox_group").animate({scrollLeft: $("#calbox_group").offset().left + $("#calbox_1").width() }, 200);
+		}); 
+		
+		$("#landscape").on("touchstart mousedown", function(e) {
+			e.preventDefault();
+			if(ls == "1")
+			{
+				$("#ls_title").show();
+				$("#ls_purchase").show();
+				$("#ls_gratuity").show();
+				$("#ls_total").show();
+			
+				$("#l_title").hide();
+				$("#l_purchase").hide();
+				$("#l_gratuity").hide();
+				$("#l_total").hide();
+				
+				ls = "0";
+			}
+			else
+			{
+				$("#l_title").show();
+				$("#l_purchase").show();
+				$("#l_gratuity").show();
+				$("#l_total").show();
+			
+				$("#ls_title").hide();
+				$("#ls_purchase").hide();
+				$("#ls_gratuity").hide();
+				$("#ls_total").hide();
+				
+				ls = "1";
+			}
+		});
+		
+		cal();
+
+		/*
+		if(localStorage.getItem("page") != "page1")
+		{
+			$.mobile.initializePage();
+		}
+		$("#" + localStorage.getItem("page")).page();
+		*/
+	});
+
+	function ScaleContentToDevice() {
+		$(document).find("[data-role='content']").height($(window).height() - 94);
+	}
+
+	function cal() {
+		localStorage.setItem("cal1", cal1);
+		localStorage.setItem("cal2", cal2);
+		localStorage.setItem("rate", $("#slider_rate").val());
+		localStorage.setItem("person", $("#slider_person").val());
+
+		pur = parseInt(cal1);
+		s_pur = Math.round(pur / $("#slider_person").val());
+		
+		if($("input:radio[name=round]:checked").val() != "n")
+		{
+			if($("input:radio[name=round]:checked").val() == "g")
+			{
+				gra = roundNumber(pur * parseFloat($("#slider_rate").val() * 0.01));
+				res = pur + parseFloat(gra);
+			
+				s_gra = Math.round(gra / $("#slider_person").val());
+				s_res = parseFloat(s_pur) + parseFloat(s_gra);
+							
+				// console.log("g");
+			}
+			else if($("input:radio[name=round]:checked").val() == "t")
+			{
+				res = roundNumber(pur * (1 + parseFloat($("#slider_rate").val() * 0.01)))
+				if(res >= pur) gra = res - pur; else { gra = 0; res = pur; }
+
+				s_res = Math.round(res / $("#slider_person").val());
+				if(res >= pur) s_gra = parseFloat(s_res) - parseFloat(s_pur); else { s_gra = 0; s_res = s_pur; }
+				
+				// console.log("t");
+			}
+		}
+		else
+		{
+			gra = parseInt(cal1) * parseFloat($("#slider_rate").val() * 0.01);
+			res = parseInt(cal1) + parseFloat(gra);
+			
+			s_gra = Math.round(gra / $("#slider_person").val());
+			s_res = parseFloat(s_pur) + parseFloat(s_gra);
+			
+			// console.log("n");
+		}
+	
+		
+		// console.log("cal1=" + cal1 + ", cal2=" + cal2 + ", rate=" + $("#slider_rate").val() + ", person=" + $("#slider_person").val());
+		// console.log("pur=" + pur + ", s_pur=" + s_pur);
+		// console.log("gra=" + gra + ", s_gra=" + s_gra);
+		// console.log("res=" + res + ", s_res=" + s_res);
+		// console.log("-----------------------------------------------------");
+		
+		$("#box_purchase").text(formatCurrency(pur));
+		$("#box_gratuity").text(formatCurrency(gra));
+		
+		$("#t_purchase").text(formatCurrency(pur));
+		$("#t_gratuity").text(formatCurrency(gra));
+		$("#t_result").text(formatCurrency(res));			
+
+		$("#s_purchase").text(formatCurrency(s_pur));
+		$("#s_gratuity").text(formatCurrency(s_gra));
+		$("#s_result").text(formatCurrency(s_res));	
+		
+		$("#l_purchase").text($("#t_purchase").text());
+		$("#l_gratuity").text($("#t_gratuity").text());
+		$("#l_total").text($("#t_result").text());
+		
+		$("#ls_purchase").text($("#s_purchase").text());
+		$("#ls_gratuity").text($("#s_gratuity").text());
+		$("#ls_total").text($("#s_result").text());
+	}
+	
+	function roundNumber(n,m) {
+		if(!m)
+		{
+			if($("input:radio[name=method]:checked").val() == "u")
+				{ return Math.ceil(n / 100) * 100; }
+			else if($("input:radio[name=method]:checked").val() == "d")
+				{ return Math.floor(n / 100) * 100; }
+			else
+				{ return Math.round(n / 100) * 100; }
+		}
+		else
+		{
+			if(m == "u")
+				{ return Math.ceil(n / 100) * 100; }
+			else if(m == "d")
+				{ return Math.floor(n / 100) * 100; }
+			else
+				{ return Math.round(n / 100) * 100; }
+		}	
+	}
+	
+	function ent(val) {
+		if(val == "c" || val == "ac")
+		{
+			if(cal1 != "0" && cal2 != "0")
+			{
+				cal1 = 0;
+			}
+			else if(cal1 == "0" && cal2 != "0")
+			{
+				cal1 = 0;
+				cal2 = 0;
+				
+				$("#button_plus").text("+");
+				$("#button_plus").css({"color":"#333", "border":"#17A solid 2px", "background":"#FFF"});
+			}
+			else
+			{
+				cal1 = 0;
+			}
+
+			if($("#button_plus").text() == "=")
+			{
+				$("#button_clear").text("ac");
+			}
+			else
+			{
+				$("#button_clear").text("c");
+			}
+			
+			cal();
+		}
+		else if(val == "+")
+		{
+			if(cal1 != "0")
+			{
+				cal2 = cal1;
+			
+				$("#button_plus").text("=");
+				$("#button_plus").css({"color":"#EEE", "border":"#DDD solid 1px", "background":"#17A"});
+			
+				cal1 = 0;
+			}
+		}
+		else if(val == "=")
+		{
+			cal1 = parseFloat(cal1) + parseFloat(cal2);
+			
+			$("#button_plus").text("+");
+			$("#button_clear").text("c");
+			$("#button_plus").css({"color":"#333", "border":"#17A solid 2px", "background":"#FFF"});
+
+			cal2 = 0
+			
+			cal();
+		}
+
+		else
+		{
+			if(cal1 == "0")
+				cal1 = "";
+				
+			if(cal1.toString().length < "8")
+				cal1 += val.toString();
+
+			$("#button_clear").text("c");
+			cal();
+		}	
+	}
+
+	function formatCurrency(n){
+		return "$" + ((n * 0.01).toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	
+	//$(window).load(function(){ });
+	
+</script>
+
+<style>
+/* Page 1 */
+
+	#landscape {
+		display: none;
+	}
+	   
+	@media only screen and (orientation:landscape) {
+		#portrait { visibility: hidden; }
+		#landscape { display: block; width: 100%; height: 100%; }
+	}
+  
+	@media only screen and (orientation:portrait) {
+		#landscape { display: none; }
+	}
+
+	div.ui-content {
+		display:table-cell;
+		
+		width: 320px;
+		border: 0px none;
+		padding-top: 16px;
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-bottom: 0px;
+		
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	table.grid {
+		width: 310px;
+		
+		font-size: 24px;
+		
+		border: 1px solid #CCC;
+		padding: 5px;
+		color: #069;
+		background: #FFE;
+		
+		border-radius: 8px;
+		-moz-border-radius: 8px;
+		-webkit-border-radius: 8px;
+	}
+	
+	table.grid tr td:nth-child(even) {
+		width: 175px;
+		
+		border-bottom: 1px dotted #AAA;
+		color: #963;
+	}	
+	
+	div#result_box {
+		width: 312px;
+		height: 80px;
+		
+		background: #F0F0EF;
+		text-align: right;
+		vertical-align: bottom;
+		border: #069 solid 1px;
+
+		border-radius: 10px;
+		-moz-border-radius: 10px;
+		-webkit-border-radius: 10px;
+	}
+
+	div#console_box {
+		width: 312px;
+		height: 60px;
+		
+		background: #FFE;
+		text-align: right;
+		vertical-align: bottom;
+		border: #069 solid 1px;
+
+		border-radius: 10px;
+		-moz-border-radius: 10px;
+		-webkit-border-radius: 10px;
+	}
+	
+	div.box_title {
+		position: relative;
+	
+		right: 10px;
+		top: 5px;
+		
+		font-size: 10px;
+		color: #999;
+	}
+
+	div#box_gratuity {
+		position: relative;
+	
+		right: 10px;
+		top: 2px;
+		
+		font-size: 50px;
+		color: #963;
+	}
+		
+	div#box_purchase {
+		position: relative;
+	
+		right: 10px;
+		top: 5px;
+		
+		font-size: 30px;
+		color: #069;
+	}	
+		
+	table#keyboard {
+		width: 320px;
+		text-align: center;
+		}
+	
+	table#keyboard td div.key {
+		display: block;
+		cursor: pointer;
+		width: 90px;
+		height: 54px;
+		line-height: 54px;
+		border: #17A solid 2px;
+
+		color: #333;
+		font-size: 36px;
+		text-decoration: none;
+		text-align: center;
+		vertical-align: middle;
+	
+		border-radius: 40px;
+		-moz-border-radius: 40px;
+		-webkit-border-radius: 40px;
+	}
+	
+	table#keyboard td div.key:active {
+		color: #EEE;
+		border: #DDD solid 1px;
+		background: #17A;
+	}
+	
+	div#calbox_group {
+		position: relative;
+		overflow: hidden;
+		height: 154px;
+		width: 320px;
+	}
+	
+	div.calbox {
+		display: table-cell;
+		vertical-align: middle;
+		height: 154px;
+		width: 320px;
+	}
+	
+	div.calbox table {
+		width: 321px;
+	}
+/* Page 2 */
+
+/* Landscape */
+.landscape {
+	color: #936;
+	min-width: 400px;
+	font-size: 40px;
+}
+
+.landscape td {
+	border-bottom: 2px dotted #999;
+}
+
+.caltitle {
+	font-size: 10px;
+	color: #999;
+}
+/* Landscape */
+</style>
+</head>
+
+<body>
+<div id="landscape">
+	<table style="width: 100%; height: 100%; text-align: center; vertical-align: middle">
+		<tr><td>
+		<center>
+		<table class="landscape">
+			<tr>
+				<td colspan="3">
+					<div class="caltitle" id="l_title">RESULT</div>
+					<div class="caltitle" id="ls_title" style="display: none;">RESULT - PER PERSON</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: left;">
+					Purchase:
+				</td>
+				<td style="text-align: right;">
+				 <span id="l_purchase">$0.00</span>
+				 <span id="ls_purchase" style="display: none;">$0.00</span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: left;">
+					Gratuity:
+				</td>
+				<td style="text-align: right;">
+					<span id="l_gratuity">$0.00</span>
+					<span id="ls_gratuity" style="display: none;">$0.00</span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: left;">
+					Total:
+				</td>
+				<td style="text-align: right;">
+					<span id="l_total">$0.00</span>
+					<span id="ls_total" style="display: none;">$0.00</span>
+				</td>
+			</tr>
+		</table>
+		</center>
+		</td></tr>
+		</table>
+</div>
+
+<div id="portrait">
+<!-- Page 1 -->
+<div data-role="page" id="page1">
+
+	<div data-role="header">
+	</div>
+
+	<div role="main" data-role="content" class="ui-content">
+		<center>
+		<div id="calbox_group">
+		<div class="calbox" id="calbox_1">
+		<table style="width: 321px;">
+		<tr>
+				<td colspan="3">
+					<div id="result_box">
+						<div class="box_title">
+							- GRATUITY -
+						</div>
+						<div id="box_gratuity">
+							$0.00
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<div id="console_box">
+						<div class="box_title">
+							- PURCHASE -
+						</div>
+						<div id="box_purchase">
+							$0.00
+						</div>
+					</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+		</div>
+		<div class="calbox" id="calbox_2">
+		<table>
+			<tr>
+				<td colspan="3">
+					<table class="grid" style="width: 314px;">
+						<tr>
+							<td style="text-align: left;">
+								Purchase:
+							</td>
+							<td style="text-align: right;">
+								<span id="t_purchase">$0.00</span>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: left;">
+								Gratuity:
+							</td>
+							<td style="text-align: right;">
+								<span id="t_gratuity">$0.00</span>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: left;">
+								Total:
+							</td>
+							<td style="text-align: right;">
+								<span id="t_result">$0.00</span>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		</div>
+		</div>
+		<table id="keyboard">
+			<tr>
+				<td><center><div class="key">1</div></center></td>
+				<td><center><div class="key">2</div></center></td>
+				<td><center><div class="key">3</div></center></td>
+			</tr>
+			
+			<tr>
+				<td><center><div class="key">4</div></center></td>
+				<td><center><div class="key">5</div></center></td>
+				<td><center><div class="key">6</div></center></td>
+			</tr>
+			
+			<tr>
+				<td><center><div class="key">7</div></center></td>
+				<td><center><div class="key">8</div></center></td>
+				<td><center><div class="key">9</div></center></td>
+			</tr>
+			
+			<tr>
+				<td class="r"><center><div id="button_plus" class="key">+</div></center></td>
+				<td class="m"><center><div class="key">0</div></center></td>
+				<td class="l"><center><div id="button_clear" class="key">c</div></center></td>
+			</tr>
+		</table>
+		</center>
+	</div>
+
+	<div data-role="footer" data-id="footer_navbar" data-position="fixed" data-tap-toggle="false">
+		<div class="navbar ui-body-a" data-role="navbar">
+        	<ul>
+				<li><a href="#page1" data-icon="edit" class="ui-btn-active ui-state-persist">Calculate</a></li>
+				<li><a href="#page2" data-icon="bars">Separate</a></li>
+				<li><a href="#page3" data-icon="gear">Settings</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /Page 1 -->
+
+<!-- Page 2 -->
+<div data-role="page" id="page2">
+
+	<div data-role="header">
+	</div>
+
+	<div role="main" data-role="content" class="ui-content">
+		<center>
+		<p>
+		<table class="grid">
+			<tr>
+				<td style="text-align: left;">
+					Purchase:
+				</td>
+				<td style="text-align: right;">
+					<span id="s_purchase">$0.00</span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: left;">
+					Gratuity:
+				</td>
+				<td style="text-align: right;">
+					<span id="s_gratuity">$0.00</span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: left;">
+					Total:
+				</td>
+				<td style="text-align: right;">
+					<span id="s_result">$0.00</span>
+				</td>
+			</tr>
+		</table>
+		</p>
+		<p>
+		<table>
+			<tr>
+				<td style="width: 282px;">
+					<legend>How many people?</legend>
+					<label for="slider_person" class="ui-hidden-accessible">People</label>
+					<input type="range" id="slider_person" min="2" max="12" value="1">
+				</td>
+    		</tr>
+		</table>
+		</p>
+		</center>
+	</div>
+
+	<div data-role="footer" data-id="footer_navbar" data-position="fixed" data-tap-toggle="false">
+		<div class="navbar ui-body-a" data-role="navbar">
+        	<ul>
+            	<li><a href="#page1" data-icon="edit">Calculate</a></li>
+				<li><a href="#page2" data-icon="bars" class="ui-btn-active ui-state-persist">Separate</a></li>
+				<li><a href="#page3" data-icon="gear">Settings</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /Page 2 -->
+
+<!-- Page 3 -->
+<div data-role="page" id="page3">
+
+	<div data-role="header">
+	</div>
+
+	<div role="main" data-role="content" class="ui-content">
+		<center>
+		<table>
+			<tr>
+				<td>
+					<legend>Percentage:</legend>
+					<label for="slider_rate" class="ui-hidden-accessible">Percentage</label>
+					<input type="range" id="slider_rate" min="0" max="25" value="15">
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+					<legend>Round:</legend>
+					<input type="radio" data-theme="c" name="round" id="round-n" value="n" checked="checked">
+					<label for="round-n">None</label>
+					<input type="radio" data-theme="c" name="round" id="round-g" value="g">
+					<label for="round-g">Round Gratuity</label>
+					<input type="radio" data-theme="c" name="round" id="round-t" value="t">
+					<label for="round-t">Round Total</label>
+				</fieldset>
+    			</td>
+			</tr>
+			<tr>
+				<td>
+				<fieldset id="method" data-role="controlgroup" data-type="horizontal" data-mini="true" style="">
+					<legend>Method:</legend>
+					<input type="radio" data-theme="c" name="method" id="method-d" value="d">
+					<label for="method-d">Round down</label>
+					<input type="radio" data-theme="c" name="method" id="method-o" value="o" checked="checked">
+					<label for="method-o">Round Off</label>
+					<input type="radio" data-theme="c" name="method" id="method-u" value="u">
+					<label for="method-u">Round Up</label>
+				</fieldset>
+				</td>
+			</tr>
+		</table>
+		</center>
+		<!-- <input type="button" value="clean" onclick="JavaScript:localStorage.clear();" /> -->
+	</div>
+
+	<div data-role="footer" data-id="footer_navbar" data-position="fixed" data-tap-toggle="false">
+		<div class="navbar ui-body-a" data-role="navbar">
+        	<ul>
+            	<li><a href="#page1" data-icon="edit">Calculate</a></li>
+				<li><a href="#page2" data-icon="bars">Separate</a></li>
+				<li><a href="#page3" data-icon="gear" class="ui-btn-active ui-state-persist">Settings</a></li>
+			</ul>
+		</div><!-- /navbar -->
+	</div><!-- /footer -->
+</div><!-- /Page 3 -->
+</div>
+</body>
+</html>
