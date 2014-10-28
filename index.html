@@ -16,14 +16,6 @@
 <script src="js/jquery.mobile.js"></script>
 
 <script>
-	(function ($) {
-    $.fn.tclick = function (onclick) {
-        this.bind("touchstart", function (e) { onclick.call(this, e); e.stopPropagation(); e.preventDefault(); });
-        this.bind("click", function (e) { onclick.call(this, e); });   //substitute mousedown event for exact same result as touchstart         
-        return this;
-    };
-	})(jQuery);
-
 	var ua = navigator.userAgent.toLowerCase();
 	var isAndroid = ua.indexOf("android") > -1;
 	if(isAndroid) {
@@ -33,6 +25,7 @@
 	var cal1=0, cal2=0, pur=0, gra=0, res=0, s_pur=0, s_gra=0, s_res=0,ls=1;
 
 	$(document).ready(function() {
+		var isTouchSupported = 'ontouchstart' in window;
 		$("#portrait").css("display", "none");
 		$("#landscape").css("display", "none");
 		$("#install").css("display", "none");
@@ -55,8 +48,11 @@
 		$(document).on("touchmove mousemove", function(e){ e.preventDefault(); });
 		$(document).on("touchmove mousemove", "#page2", function(e) { e.preventDefault(); cal(); });
 		$(document).on("touchmove mousemove", "#page3", function(e) { e.preventDefault(); cal(); });
-
-		$('div.key').on({"touchstart mousedown":function(e){ e.preventDefault(); ent($(this).text()); } });
+		
+		if(isTouchSupported)
+			$("div.key").on({"touchstart":function(e){ e.preventDefault(); ent($(this).text()); } });
+		else
+			$("div.key").on({"mousedown":function(e){ e.preventDefault(); ent($(this).text()); } });			
 		
 		$("input:radio").on("change", function() {
 			localStorage.setItem("round", $("input:radio[name=round]:checked").val());
@@ -367,7 +363,6 @@
 	}
 	
 	div.ui-panel {
-		padding-top: 15px;
 		position: relative;
 		display: block;
 		
@@ -378,7 +373,8 @@
 		border: 0px none;
 		
 		padding: 0px;
-		
+		padding-top: 15px;
+
 		left: 50%;
 		margin-left: -160px;
 		
