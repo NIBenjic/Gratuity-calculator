@@ -16,14 +16,6 @@
 <script src="js/jquery.mobile.js"></script>
 
 <script>
-		(function ($) {
-		$.fn.tclick = function (onclick) {
-        	this.bind("touchstart", function (e) { onclick.call(this, e); e.stopPropagation(); e.preventDefault(); });
-			this.bind("click", function (e) { onclick.call(this, e); });
-        return this;
-		};
-		})(jQuery);
-
 	var ua = navigator.userAgent.toLowerCase();
 	var isAndroid = ua.indexOf("android") > -1;
 	if(isAndroid) {
